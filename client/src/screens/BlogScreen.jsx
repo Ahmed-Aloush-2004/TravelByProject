@@ -19,24 +19,30 @@ import {
 } from "@chakra-ui/react";
 import { Link as ReactLink, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getBlogPostByCategory } from "../redux/actions/blogPostActions";
+import {
+  getBlogPostByCategory,
+  previousPageClick,nextPageClick
+} from "../redux/actions/blogPostActions";
 import { ArrowRightIcon, ArrowLeftIcon } from "@chakra-ui/icons";
 
 function BlogScreen() {
   const { category } = useParams();
 
   const blogPostInfo = useSelector((state) => state.blogPosts);
-  const { blogPosts, loading, error, pageItems } = blogPostInfo;
+  const { blogPosts, loading, error, pageItems, status, pageTitle } =
+    blogPostInfo;
   const dispath = useDispatch();
   useEffect(() => {
     dispath(getBlogPostByCategory(category, pageItems));
     window.scroll(0, 0);
-  }, [dispath, category, pageItems]);
+  }, [dispath, category, pageItems,status]);
   console.log(blogPosts);
 
   return (
     <VStack spacing={"30px"} minHeight={"100vh"}>
-      <Heading fontSize={"5xl"} mb={"16"}></Heading>
+      <Heading fontSize={"5xl"} mb={"16"}>
+        {pageTitle}
+      </Heading>
       {loading ? (
         <Stack direction={"row"} spacing={"4"}>
           <Spinner
@@ -97,7 +103,7 @@ function BlogScreen() {
                         as={ReactLink}
                         to={`/blog/${post.category}`}
                       >
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                        {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
                       </Link>
                     </Text>
                     <Spacer />
@@ -112,6 +118,24 @@ function BlogScreen() {
           ))}
         </>
       )}
+     {!loading &&
+     <Flex>
+     <Button
+     m={"3"}
+     isDisabled={pageItems === 0}
+          onClick={() => dispath(previousPageClick(pageItems))}
+        >
+          <ArrowLeftIcon />
+          </Button>{" "}
+        <Button
+          m={"3"}
+          isDisabled={status === 201 || blogPosts.length <= 3}
+          onClick={() => dispath(nextPageClick(pageItems))}
+          >
+          <ArrowRightIcon />
+        </Button>
+      </Flex>
+          }
     </VStack>
   );
 }

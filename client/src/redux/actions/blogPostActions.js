@@ -1,13 +1,19 @@
 import axios from "axios";
 
 import {
+  setLoading,
+  setError,
   setBlogPost,
   setBlogPostByCategory,
-  setError,
-  setLoading,
   blogPostCreated,
   blogPostRemoved,
   blogPostUpdated,
+  setRemoveButtonLoading,
+  reset,
+  setNextPage,
+  setPreviousPage,
+  setStatus,
+  setUpdateButtonLoading
 } from "../slices/blogPost";
 
 export const getBlogPostByCategory =
@@ -15,8 +21,9 @@ export const getBlogPostByCategory =
     dispath(setLoading(true));
 
     try {
-      const { data } = await axios.get("http://localhost:5000/api/blog-posts");
+      const { data,status } = await axios.get(`http://localhost:5000/api/blog-posts/${category}/${pageItems}`);
       dispath(setBlogPostByCategory(data));
+      dispath(setStatus(status))
       console.log(data);
       
     } catch (error) {
@@ -31,3 +38,18 @@ export const getBlogPostByCategory =
       );
     }
   };
+
+
+
+
+
+
+  export const nextPageClick=(pageItems) =>  async (dispath) => {
+    dispath(setNextPage(pageItems + 4));
+  }
+  export const previousPageClick=(pageItems) =>  async (dispath) => {
+    dispath(setPreviousPage(pageItems - 4));
+  }
+  export const resetLoaderAndFlags=() =>  async (dispath) => {
+    dispath(reset());
+  }
