@@ -2,6 +2,14 @@ const BlogPost = require("../models/BlogPost");
 const express = require("express");
 const router = express.Router();
 
+router.get("/post/:id", async (req, res) => {
+  const blogPost = await BlogPost.findById(req.params.id);
+  if (blogPost) {
+    return res.json(blogPost);
+  } else {
+    return res.status(404).json({ msg: "Blog post not found" });
+  }
+});
 router.get("/:category/:pageNumber", async (req, res) => {
   const { category, pageNumber } = req.params;
 
@@ -36,9 +44,4 @@ router.get("/:category/:pageNumber", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
-  const blogPost = await BlogPost.findById(req.params.id);
-  if (!blogPost) return res.status(404).json({ msg: "Blog post not found" });
-  res.json(blogPost);
-});
 module.exports = router;

@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import BlogScreen from "./screens/BlogScreen";
+import SingleBlogScreen from "./screens/SingleBlogScreen";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -11,7 +12,10 @@ const router = createBrowserRouter([
       path: "blog/:category",
       element: <BlogScreen/>
     },]
-  },
+  },{
+    path:"/:id",
+    element:<SingleBlogScreen/>
+  }
 ]);
 
 const App = () => {
