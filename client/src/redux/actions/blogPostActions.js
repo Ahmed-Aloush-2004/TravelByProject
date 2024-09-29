@@ -17,55 +17,152 @@ import {
 } from "../slices/blogPost";
 
 export const getBlogPostByCategory =
-  (category, pageItems) => async (dispath) => {
-    dispath(setLoading(true));
+  (category, pageItems) => async (dispatch) => {
+    dispatch(setLoading(true));
 
     try {
       const { data, status } = await axios.get(
         `http://localhost:5000/api/blog-posts/${category}/${pageItems}`
       );
-      dispath(setBlogPostByCategory(data));
-      dispath(setStatus(status));
+      dispatch(setBlogPostByCategory(data));
+      dispatch(setStatus(status));
       console.log(data);
     } catch (error) {
-      dispath(
+      dispatch(
         setError(
           error.response && error.response.data.message
             ? error.response.data.message
             : error.message
             ? error.message
-            : "An  unexpected error occurred.please try again later."
+            : "An unexpected error occurred. Please try again later."
         )
       );
     }
   };
 
-export const getBlogPost = (id) => async (dispath) => {
-  dispath(setLoading(true));
+export const getBlogPost = (id) => async (dispatch) => {
+  dispatch(setLoading(true));
   try {
     const { data } = await axios.get(
       `http://localhost:5000/api/blog-posts/post/${id}`
     );
 
-    dispath(setBlogPost(data));
+    dispatch(setBlogPost(data));
   } catch (error) {
-    dispath(
+    dispatch(
       setError(
         error.response && error.response.data.message
           ? error.response.data.message
           : error.message
           ? error.message
-          : "An  unexpected error occurred.please try again later."
+          : "An unexpected error occurred. Please try again later."
       )
     );
   }
 };
-export const nextPageClick = (pageItems) => async (dispath) => {
-  dispath(setNextPage(pageItems + 4));
+
+export const nextPageClick = (pageItems) => async (dispatch) => {
+  dispatch(setNextPage(pageItems + 4));
 };
-export const previousPageClick = (pageItems) => async (dispath) => {
-  dispath(setPreviousPage(pageItems - 4));
+
+export const previousPageClick = (pageItems) => async (dispatch) => {
+  dispatch(setPreviousPage(pageItems - 4));
 };
-export const resetLoaderAndFlags = () => async (dispath) => {
-  dispath(reset());
+
+export const resetLoaderAndFlags = () => async (dispatch) => {
+  dispatch(reset());
+};
+
+export const createNewBlogPost = (newPost) => async (dispatch, getState) => {
+  dispatch(blogPostCreated(false));
+  dispatch(setUpdateButtonLoading(true));
+  const {
+    user: { userInfo },
+  } = getState();
+  try {
+    console.log(userInfo);
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    await axios.post("http://localhost:5000/api/blog-posts", newPost, config);
+    dispatch(blogPostCreated(true));
+  } catch (error) {
+    dispatch(
+      setError(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+          ? error.message
+          : "An unexpected error occurred. Please try again later."
+      )
+    );
+  }
+};
+
+export const updatePost = (updatedPost) => async (dispatch, getState) => {
+  dispatch(blogPostUpdated(false));
+  dispatch(setUpdateButtonLoading(true));
+  const {
+    user: { userInfo },
+  } = getState();
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    await axios.put(
+      "http://localhost:5000/api/blog-posts",
+      updatedPost,
+      config
+    );
+    dispatch(blogPostUpdated(true));
+  } catch (error) {
+    dispatch(
+      setError(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+          ? error.message
+          : "An unexpected error occurred. Please try again later."
+      )
+    );
+  }
+};
+
+export const removePost = (_id) => async (dispatch, getState) => {
+  dispatch(setRemoveButtonLoading(true));
+  dispatch(blogPostRemoved(false));
+  const {
+    user: { userInfo },
+  } = getState();
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    const { data } = await axios.delete(
+      `http://localhost:5000/api/blog-posts/${_id}`,
+      config
+    );
+    dispatch(setBlogPostByCategory(data));
+    dispatch(blogPostRemoved(true));
+  } catch (error) {
+    dispatch(
+      setError(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+          ? error.message
+          : "An unexpected error occurred. Please try again later."
+      )
+    );
+  }
 };

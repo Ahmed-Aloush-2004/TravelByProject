@@ -38,6 +38,7 @@ export const blogPostSlice = createSlice({
     },
     blogPostCreated: (state, action) => {
       state.blogPostCreated = action.payload;
+      state.updateButtonLoading = false;
       state.loading = false;
       state.error = null;
     },

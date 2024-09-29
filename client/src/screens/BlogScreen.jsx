@@ -135,6 +135,7 @@ function BlogScreen() {
           <ArrowRightIcon />
         </Button>
       </Flex>
+      
           }
     </VStack>
   );

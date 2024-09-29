@@ -19,7 +19,7 @@ const blogPostSchema = new mongoose.Schema({
   },
   author: {
     type: String,
-    required: true,
+    // required: true,
   },
   category: {
     type: String,
